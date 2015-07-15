@@ -1,0 +1,4 @@
+*.pyc
+teamspeaknotifier.egg-info
+build
+dist

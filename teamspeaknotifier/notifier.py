@@ -1,9 +1,9 @@
 import logging
 import re
 import time
-from subprocess import Popen, PIPE
+from notification import MountainLionNotification
+import AppKit
 
-import pynotify
 import teamspeak3
 
 class TeamspeakNotifier(object):
@@ -19,32 +19,19 @@ class TeamspeakNotifier(object):
         super(TeamspeakNotifier, self).__init__()
         self.logger = logging.getLogger('TeamspeakNotifier')
 
-        pynotify.init('TeamspeakNotifier')
-        self.notification = pynotify.Notification(
-            "Starting",
-            "TeamspeakNotifier is attempting to find your instance of Teamspeak."
-            )
-        self.notification.show()
+        self.notification = MountainLionNotification.alloc().init()
+        self.notification.notify(
+            title="TeamSpeak 3",
+            subtitle="Starting",
+            text="TeamspeakNotifier is finding Teamspeak."
+        )
         self.connect()
 
         self.clients = {}
         self.identity = None
 
     def get_active_window_title(self):
-        root = Popen(['xprop', '-root', '_NET_ACTIVE_WINDOW'], stdout=PIPE)
-
-        for line in root.stdout:
-            m = re.search('^_NET_ACTIVE_WINDOW.* ([\w]+)$', line)
-            if m != None:
-                id_ = m.group(1)
-                id_w = Popen(['xprop', '-id', id_, 'WM_NAME'], stdout=PIPE)
-                break
-
-        if id_w != None:
-            for line in id_w.stdout:
-                match = re.match("WM_NAME\(\w+\) = (?P<name>.+)$", line)
-                if match != None:
-                    return match.group("name")[1:-1]
+        return AppKit.NSWorkspace.sharedWorkspace().activeApplication()['NSApplicationName']
 
     def _update_notification(self, title, message = ''):
         self.logger.debug("Posting Notification: [%s]%s" % (
@@ -52,19 +39,18 @@ class TeamspeakNotifier(object):
                     message,
                 )
             )
-        self.notification.update(title, message)
-        self.notification.show()
+        self.notification.notify(title=title, text=message)
 
     def notify(self, message):
         if message.ultimate_origination == 'notifytextmessage':
             if not self.teamspeak_is_active() and not self.message_is_mine(message):
                 if message['targetmode'] == self.TARGETMODE_CLIENT:
                     title = "%s said (via private message)" % (
-                            self.get_name_for_message(message), 
+                            self.get_name_for_message(message),
                         )
                 else:
                     title = "%s said" % (
-                            self.get_name_for_message(message), 
+                            self.get_name_for_message(message),
                         )
                 self._update_notification(title, message['msg'])
         elif message.ultimate_origination == 'notifytalkstatuschange':
@@ -113,10 +99,10 @@ class TeamspeakNotifier(object):
         try:
             if 'clid' in message.keys():
                 return message['clid'] == self.identity
-            elif 'invokerid' in message.keys():
-                return message['invokerid'] == self.identity
             elif 'invokername' in message.keys():
                 return self.clients[self.identity] == message['invokername']
+            elif 'invokerid' in message.keys():
+                return message['invokerid'] == self.identity
         except KeyError:
             pass
         return False
@@ -125,10 +111,10 @@ class TeamspeakNotifier(object):
         try:
             if 'clid' in message.keys():
                 return self.clients[message['clid']]
-            elif 'invokerid' in message.keys():
-                return self.clients[message['invokerid']]
             elif 'invokername' in message.keys():
                 return message['invokername']
+            elif 'invokerid' in message.keys():
+                return self.clients[message['invokerid']]
         except KeyError:
             pass
         return self.DEFAULT_NAME
@@ -158,12 +144,13 @@ class TeamspeakNotifier(object):
                 self.api.subscribe()
                 self.logger.info("Connection established.")
                 self._update_notification(
-                        "Ready", 
+                        "Ready",
                         "Teamspeak is now listening for messages."
                     )
                 self.send_client_update_commands()
                 return True
-            except teamspeak3.exceptions.TeamspeakConnectionLost:
+            except teamspeak3.exceptions.TeamspeakConnectionLost as e:
+                self.logger.exception(e)
                 pass
             except Exception as e:
                 self.logger.exception(e)

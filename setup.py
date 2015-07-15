@@ -23,3 +23,23 @@ setup(
             'teamspeak3>=1.3',
         ]
 )
+
+# from setuptools import setup
+
+# APP = ['teamspeaknotifier/notifier.py']
+# DATA_FILES = []
+# OPTIONS = {
+#     'argv_emulation': True,
+#     'plist': {
+#         'LSUIElement': True,
+#     },
+#     'packages': ['rumps'],
+# }
+
+# setup(
+#     app=APP,
+#     version=get_version(),
+#     data_files=DATA_FILES,
+#     options={'py2app': OPTIONS},
+#     setup_requires=['py2app','teamspeak3>=1.3'],
+# )
