@@ -5,7 +5,8 @@ if you don't have your headphones on.
 
 This application will watch for incoming messages in Teamspeak and, should you
 be in a different window, display a notification to let you know that you
-recieved a message.
+recieved a message. It will also alert to tell you who is speaking, which is
+especially useful in large rooms.
 
 This uses OS X's Notification Center to display notifications, so it requires 10.8+.
 There may be bugs in OS X betas as Apple has been known to change the API.
