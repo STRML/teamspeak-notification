@@ -14,6 +14,7 @@ There may be bugs in OS X betas as Apple has been known to change the API.
 ## Requirements
 
  - teamspeak3
+ - Enabled "Client Query" plugin in TeamSpeak.
 
 ## Setup
 
@@ -21,11 +22,12 @@ There may be bugs in OS X betas as Apple has been known to change the API.
 
 ## Use
 
-You can either run the program directly like:
+You can run the program directly with:
 
-    teamspeak-notifier &
+    ./teamspeak-notifier
 
-Add it to your automatically started applications.
+Add it to your automatically started applications. It will automatically connect
+to TeamSpeak when it is available.
 
 ## Arguments
 
