@@ -1,16 +1,22 @@
-# TeamSpeak Notifier
+# TeamSpeak Notifier for Mac OS X
 
-Using TeamSpeak as your office communication channel can be difficult-- especially
+Using TeamSpeak as your office communication channel can be difficult -- especially
 if you don't have your headphones on.
 
 This application will watch for incoming messages in Teamspeak and, should you
 be in a different window, display a notification to let you know that you
 recieved a message.
 
+This uses OS X's Notification Center to display notifications, so it requires 10.8+.
+There may be bugs in OS X betas as Apple has been known to change the API.
+
 ## Requirements
 
- - PyGTK
  - teamspeak3
+
+## Setup
+
+    python setup.py develop
 
 ## Use
 
